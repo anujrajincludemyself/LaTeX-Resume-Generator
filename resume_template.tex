@@ -1,0 +1,172 @@
+% resume_template.tex
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage[hidelinks]{hyperref} % hidelinks removes the red boxes
+\usepackage{enumitem}
+\usepackage{needspace}
+\usepackage{titlesec}
+\usepackage{textcomp} % For special symbols
+\usepackage{graphicx} % For icons, if needed
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{verbments} % <-- NEW PACKAGE FOR SAFE TEXT
+
+% --- CONFIGURATION ---
+\geometry{a4paper, margin=0.75in} % Set margins
+\pagestyle{empty} % No page numbers
+\setlength{\parindent}{0pt} % No paragraph indentation
+\setlength{\parskip}{4pt} % Space between paragraphs
+
+% Define colors (based on your resume)
+\definecolor{darkblue}{HTML}{313B62} % A dark blue for headings
+\definecolor{linkcolor}{HTML}{0000FF} % Standard blue for links
+
+% Setup hyperlinks
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+}
+
+% --- SECTION FORMATTING ---
+\titleformat{\section}
+  {\Needspace{4\baselineskip}\Large\bfseries\color{darkblue}}
+  {}
+  {0em}
+  {}[\color{darkblue}\titlerule\vspace{2pt}]
+
+% --- HELPER COMMANDS ---
+% Use \pygmentize from verbments for robust escaping
+\newcommand{\safeText}[1]{\pygmentize[text]{#1}}
+
+% Command for a list item
+\newcommand{\desc}[1]{\item \safeText{#1}}
+
+% Command for a section with two items on one line (e.g., Title and Date)
+\newcommand{\datedline}[2]{%
+  \par\needspace{2\baselineskip}
+  \textbf{\safeText{#1}} \hfill \safeText{#2}\par
+  \vspace{-4pt} % Reduce space after this line
+}
+
+% Command for a sub-line (e.g., company name)
+\newcommand{\subline}[1]{%
+    \textit{\safeText{#1}}\par
+}
+
+% --- DOCUMENT START ---
+\begin{document}
+
+% --- 1. HEADER (Personal Info) ---
+\begin{center}
+    {\Huge\bfseries \safeText{\VAR{name}}}
+    \vspace{4pt}
+    
+    \large
+    \href{mailto:\VAR{email}}{\safeText{\VAR{email}}} $\cdot$
+    \safeText{\VAR{phone}} $\cdot$
+    \href{\VAR{linkedin}}{LinkedIn} $\cdot$
+    \href{\VAR{github}}{GitHub}
+\end{center}
+\vspace{4pt}
+
+% --- 2. SUMMARY ---
+\BLOCK{if summary}
+\section*{Summary}
+\safeText{\VAR{summary}}
+\BLOCK{endif}
+
+% --- 3. EDUCATION ---
+\BLOCK{if education}
+\section*{Education}
+\BLOCK{for edu in education}
+  \datedline{\VAR{edu.degree}}{\VAR{edu.dates}}
+  \subline{\VAR{edu.institution}}
+  \safeText{\VAR{edu.gpa}}\par
+  \vspace{6pt}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% --- 4. SKILLS ---
+\BLOCK{if skills}
+\section*{Technical Skills}
+\begin{itemize}[leftmargin=1.5em, itemsep=0pt, parsep=0pt]
+    \BLOCK{if skills.languages}\item \textbf{Languages:} \safeText{\VAR{skills.languages}}\BLOCK{endif}
+    \BLOCK{if skills.web}\item \textbf{Web:} \safeText{\VAR{skills.web}}\BLOCK{endif}
+    \BLOCK{if skills.mobile}\item \textbf{Mobile:} \safeText{\VAR{skills.mobile}}\BLOCK{endif}
+    \BLOCK{if skills.databases}\item \textbf{Databases:} \safeText{\VAR{skills.databases}}\BLOCK{endif}
+    \BLOCK{if skills.tools}\item \textbf{Tools:} \safeText{\VAR{skills.tools}}\BLOCK{endif}
+    \BLOCK{if skills.cs_fundamentals}\item \textbf{CS Fundamentals:} \safeText{\VAR{skills.cs_fundamentals}}\BLOCK{endif}
+\end{itemize}
+\BLOCK{endif}
+
+% --- 5. INTERNSHIPS / EXPERIENCE ---
+\BLOCK{if experience}
+\section*{Experience}
+\BLOCK{for exp in experience}
+  \datedline{\VAR{exp.role}}{\VAR{exp.dates}}
+  \subline{\VAR{exp.company}}
+  \begin{itemize}[leftmargin=1.5em, itemsep=0pt, parsep=0pt]
+    \BLOCK{for point in exp.description}
+      \desc{\VAR{point}}
+    \BLOCK{endfor}
+  \end{itemize}
+  \vspace{6pt}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% --- 6. PROJECTS ---
+\BLOCK{if projects}
+\section*{Projects}
+\BLOCK{for proj in projects}
+  \datedline{\VAR{proj.name}}{%
+    \BLOCK{if proj.github_link}\href{\VAR{proj.github_link}}{GitHub}\BLOCK{endif}%
+    \BLOCK{if proj.github_link and proj.live_link} $\cdot$ \BLOCK{endif}%
+    \BLOCK{if proj.live_link}\href{\VAR{proj.live_link}}{Live}\BLOCK{endif}%
+  }
+  \begin{itemize}[leftmargin=1.5em, itemsep=0pt, parsep=0pt]
+      \desc{\VAR{proj.description}}
+  \end{itemize}
+  \vspace{6pt}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% --- 7. HACKATHONS ---
+\BLOCK{if hackathons}
+\section*{Hackathons}
+\BLOCK{for hack in hackathons}
+    \datedline{\VAR{hack.name}}{}
+    \begin{itemize}[leftmargin=1.5em, itemsep=0pt, parsep=0pt]
+        \desc{\VAR{hack.achievement}}
+    \end{itemize}
+  \vspace{6pt}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% --- 8. POSITIONS OF RESPONSIBILITY ---
+\BLOCK{if pors}
+\section*{Positions of Responsibility}
+\BLOCK{for por in pors}
+    \datedline{\VAR{por.role}}{\VAR{por.organization}}
+    \begin{itemize}[leftmargin=1.5em, itemsep=0pt, parsep=0pt]
+    \BLOCK{for point in por.description}
+        \desc{\VAR{point}}
+    \BLOCK{endfor}
+    \end{itemize}
+  \vspace{6pt}
+\BLOCK{endfor}
+\BLOCK{endif}
+
+% --- 9. CERTIFICATIONS ---
+\BLOCK{if certifications}
+\section*{Certifications}
+\begin{itemize}[leftmargin=1.5em, itemsep=0pt, parsep=0pt]
+    \BLOCK{for cert in certifications}
+        \desc{\VAR{cert.name}}
+    \BLOCK{endfor}
+\end{itemize}
+\BLOCK{endif}
+
+\end{document}
